@@ -1,5 +1,7 @@
 import socket # socketserver
+import sys
 import threading
+
 from utils import configure_logger
 from utils import get_timestamp
 
@@ -51,14 +53,25 @@ class TcpServer:
                          t_name, c_host, c_port)
 
         with c_socket:
+            buffer = b""
             while True:
                 data = c_socket.recv(1024)
-                if not data:
+                if data == b"":
+                    self.logger.info("[TcpServer][%s] - data sending ended (Client: %s:%s).",
+                                     t_name, c_host, c_port)
                     break
-                import sys
-                self.logger.info("[TcpServer][%s] - server received data from client (%s-%s).",
-                                 t_name, len(data), sys.getsizeof(data))
-                c_socket.sendall(b"Bytes sent from server localhost:10001.")
+
+                buffer += data
+                b_delimiter = b"\n"
+                while b_delimiter in buffer:
+                    line, buffer = buffer.split(b"\n", 1)
+                    message = line.decode("utf-8")
+                    self.logger.info("[TcpServer][%s] - server received data from client (%s bytes).",
+                                 t_name, sys.getsizeof(data))
+
+                    c_socket.sendall(f"echo: {message}\n".encode("utf-8"))
+
+        self.logger.debug("[TcpServer][%s] - handle_connection is ending (Client: %s:%s).",t_name, c_host, c_port)
 
 
     def run_server(self):

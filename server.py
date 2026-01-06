@@ -54,22 +54,41 @@ class TcpServer:
 
         with c_socket:
             buffer = b""
-            while True:
-                data = c_socket.recv(1024)
-                if data == b"":
-                    self.logger.info("[TcpServer][%s] - data sending ended (Client: %s:%s).",
-                                     t_name, c_host, c_port)
-                    break
 
-                buffer += data
-                b_delimiter = b"\n"
-                while b_delimiter in buffer:
-                    line, buffer = buffer.split(b"\n", 1)
-                    message = line.decode("utf-8")
-                    self.logger.info("[TcpServer][%s] - server received data from client (%s bytes).",
-                                 t_name, sys.getsizeof(data))
+            try:
+                while True:
+                    data = c_socket.recv(1024)
+                    if data == b"":
+                        self.logger.info("[TcpServer][%s] - data sending ended (Client: %s:%s).",
+                                         t_name, c_host, c_port)
+                        break
 
-                    c_socket.sendall(f"echo: {message}\n".encode("utf-8"))
+                    buffer += data
+                    b_delimiter = b"\n"
+                    while b_delimiter in buffer:
+                        line, buffer = buffer.split(b"\n", 1)
+                        message = line.decode("utf-8")
+                        self.logger.info("[TcpServer][%s] - server received data from client (%s bytes).",
+                                     t_name, sys.getsizeof(data))
+
+                        c_socket.sendall(f"echo: {message}\n".encode("utf-8"))
+
+            except ConnectionResetError:
+                self.logger.warning(
+                    "[TcpServer][%s] client %s:%s reset connection (ConnectionResetError)",
+                    t_name, c_host, c_port
+                )
+
+            except BrokenPipeError:
+                self.logger.warning(
+                    "[TcpServer][%s] broken pipe when sending to client %s:%s",
+                    t_name, c_host, c_port
+                )
+
+            except Exception as e:
+                self.logger.exception("[TcpServer][%s] unexpected error: %r",t_name, e)
+
+
 
         self.logger.debug("[TcpServer][%s] - handle_connection is ending (Client: %s:%s).",t_name, c_host, c_port)
 

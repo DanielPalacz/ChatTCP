@@ -107,6 +107,7 @@ class TcpServer:
                               s_address, client_socket)
 
             client_socket.settimeout(5)
+            # client_socket.settimeout(50)
 
             t = threading.Thread(target=self.handle_connection, args=(client_socket, s_address))
             t.start()

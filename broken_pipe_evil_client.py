@@ -28,28 +28,26 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # 2. Wysyłanie danych
     laddr = s.__str__().split("laddr=(")[1].split("raddr=(")[0]
     print("Server: ", (HOST, PORT), " - Client will send request to server (Client address: ", laddr[:-2], ".", sep="")
-    request_msg = "Client message 123456789\n"
+
+    request_msg = "hello\n"
     s.sendall(request_msg.encode("utf-8"))
     print("Server: ", (HOST, PORT), " - Client just sent request to server (Message:", repr(request_msg), ").", sep="")
-
-    # [Test] - Send message and close socket immediately.
-    # s.close()
-    # exit()
+    s.close()
 
     # 3. Socket kliencki sygnalizuje: "nie będę już nic wysyłał"
     #  - bez tego Deadlock:
-    s.shutdown(socket.SHUT_WR)
+    # s.shutdown(socket.SHUT_WR)
 
     # 4. Odbiór odpowiedzi z serwera.
-    response = b""
-    while True:
-        # print("Server: ", (HOST, PORT), "- Client may receive data from server.")
-        data = s.recv(1024)
-        if not data:
-            print("Server:", (HOST, PORT), "- Client stopped to receive data from server. Closing connection.")
-            break
-        response += data
-        print("Server:", (HOST, PORT), "- Client received data from server:", str(response))
+    # response = b""
+    # while True:
+    #     # print("Server: ", (HOST, PORT), "- Client may receive data from server.")
+    #     data = s.recv(1024)
+    #     if not data:
+    #         print("Server:", (HOST, PORT), "- Client stopped to receive data from server. Closing connection.")
+    #         break
+    #     response += data
+    #     print("Server:", (HOST, PORT), "- Client received data from server:", str(response))
+    #
 
-
-print(" - Full server response:", repr(response.decode("utf-8")))
+# print(" - Full server response:", repr(response.decode("utf-8")))

@@ -28,13 +28,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # 2. Wysyłanie danych
     laddr = s.__str__().split("laddr=(")[1].split("raddr=(")[0]
     print("Server: ", (HOST, PORT), " - Client will send request to server (Client address: ", laddr[:-2], ".", sep="")
-    request_msg = "Client message 123456789\n"
+    request_msg = "boom\n"
     s.sendall(request_msg.encode("utf-8"))
     print("Server: ", (HOST, PORT), " - Client just sent request to server (Message:", repr(request_msg), ").", sep="")
 
     # [Test] - Send message and close socket immediately.
-    # s.close()
-    # exit()
+    import os
+    os._exit(0)
 
     # 3. Socket kliencki sygnalizuje: "nie będę już nic wysyłał"
     #  - bez tego Deadlock:
